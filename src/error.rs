@@ -2,45 +2,51 @@ use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 use std::io;
 use std::ops::Deref;
+use std::result::Result as StdResult;
+
+pub type Result<T> = StdResult<T, DioniError>;
 
 #[derive(Debug)]
-pub struct CachePathError {
-    err_type: CachePathErrorType,
+pub struct DioniError {
+    err_type: DioniErrorType,
 }
 
-impl CachePathError {
-    pub fn new(err_type: CachePathErrorType) -> CachePathError {
-        CachePathError { err_type: err_type }
+impl DioniError {
+    pub fn new(err_type: DioniErrorType) -> DioniError {
+        DioniError { err_type: err_type }
     }
 }
 
-impl From<io::Error> for CachePathError {
+impl From<io::Error> for DioniError {
     fn from(err: io::Error) -> Self {
-        CachePathError::new(CachePathErrorType::Io(Box::new(err)))
+        DioniError::new(DioniErrorType::Io(Box::new(err)))
     }
 }
 
-impl Display for CachePathError {
+impl Display for DioniError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let msg: Box<dyn Display> = match &self.err_type {
-            CachePathErrorType::UnkownCachePath => Box::new("couldn't find cache path"),
-            CachePathErrorType::Io(err) => Box::new(err),
+            DioniErrorType::AuthServerStopped => Box::new("server stopped without the auth code"),
+            DioniErrorType::UnkownCachePath => Box::new("couldn't find cache path"),
+            DioniErrorType::Io(err) => Box::new(err),
         };
         write!(f, "{}", msg)
     }
 }
 
-impl Error for CachePathError {
+impl Error for DioniError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match &self.err_type {
-            CachePathErrorType::UnkownCachePath => None,
-            CachePathErrorType::Io(err) => Some(err.deref()),
+            DioniErrorType::AuthServerStopped => None,
+            DioniErrorType::UnkownCachePath => None,
+            DioniErrorType::Io(err) => Some(err.deref()),
         }
     }
 }
 
 #[derive(Debug)]
-pub enum CachePathErrorType {
+pub enum DioniErrorType {
     UnkownCachePath,
+    AuthServerStopped,
     Io(Box<dyn Error>),
 }

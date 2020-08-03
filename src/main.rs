@@ -8,17 +8,18 @@ use std::error::Error;
 use std::fs;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
+use std::result::Result as StdResult;
 
 use std::path::PathBuf;
 
-use error::{CachePathError, CachePathErrorType};
+use error::{DioniError, DioniErrorType, Result};
 
 use rspotify::client::Spotify;
 use rspotify::oauth2::{SpotifyClientCredentials, SpotifyOAuth, TokenInfo};
 use rspotify::util::generate_random_string;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> StdResult<(), Box<dyn Error>> {
     let cache_path = get_cache_path()?;
     let mut auth = SpotifyOAuth::default()
         .redirect_uri("http://localhost:29797/")
@@ -38,7 +39,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn get_cache_path() -> Result<PathBuf, CachePathError> {
+fn get_cache_path() -> Result<PathBuf> {
     match env::var_os("DIONI_CACHE")
         .and_then(|s| Some(PathBuf::from(s)))
         .or(env::var_os("XDG_CACHE_HOME").and_then(|s| {
@@ -53,11 +54,11 @@ fn get_cache_path() -> Result<PathBuf, CachePathError> {
             p.push(".spotify_token_cache.json");
             Ok(p)
         }
-        None => Err(CachePathError::new(CachePathErrorType::UnkownCachePath)),
+        None => Err(DioniError::new(DioniErrorType::UnkownCachePath)),
     }
 }
 
-async fn get_token(auth: &mut SpotifyOAuth) -> Result<TokenInfo, Box<dyn Error>> {
+async fn get_token(auth: &mut SpotifyOAuth) -> Result<TokenInfo> {
     match auth.get_cached_token().await {
         Some(token_info) => Ok(token_info),
         None => {
@@ -70,10 +71,7 @@ async fn get_token(auth: &mut SpotifyOAuth) -> Result<TokenInfo, Box<dyn Error>>
     }
 }
 
-async fn get_code_req(
-    auth: &mut SpotifyOAuth,
-    correct_state: String,
-) -> Result<TokenInfo, Box<dyn Error>> {
+async fn get_code_req(auth: &mut SpotifyOAuth, correct_state: String) -> Result<TokenInfo> {
     let listener = TcpListener::bind("127.0.0.1:29797")?;
     for stream in listener.incoming() {
         let mut stream = stream?;
@@ -119,13 +117,10 @@ async fn get_code_req(
         }
     }
 
-    // TODO: create error for this
-    Err(Box::new(CachePathError::new(
-        CachePathErrorType::UnkownCachePath,
-    )))
+    Err(DioniError::new(DioniErrorType::AuthServerStopped))
 }
 
-fn make_http_response(stream: &mut TcpStream, ok: bool) -> Result<(), Box<dyn Error>> {
+fn make_http_response(stream: &mut TcpStream, ok: bool) -> Result<()> {
     let response = if ok {
         format!(
             "HTTP/1.1 200 OK\r\n\r\n{}",
