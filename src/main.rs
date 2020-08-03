@@ -6,15 +6,17 @@ extern crate rspotify;
 use std::env;
 use std::error::Error;
 use std::fs;
+use std::future::Future;
 use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
-use std::result::Result as StdResult;
-
 use std::path::PathBuf;
+use std::pin::Pin;
+use std::result::Result as StdResult;
 
 use error::{DioniError, DioniErrorType, Result};
 
 use rspotify::client::Spotify;
+use rspotify::model::track::SavedTrack;
 use rspotify::oauth2::{SpotifyClientCredentials, SpotifyOAuth, TokenInfo};
 use rspotify::util::generate_random_string;
 
@@ -24,6 +26,7 @@ async fn main() -> StdResult<(), Box<dyn Error>> {
     let mut auth = SpotifyOAuth::default()
         .redirect_uri("http://localhost:29797/")
         .cache_path(cache_path)
+        .scope("user-library-read")
         .build();
     match get_token(&mut auth).await {
         Ok(token_info) => {
@@ -31,12 +34,35 @@ async fn main() -> StdResult<(), Box<dyn Error>> {
                 .token_info(token_info)
                 .build();
             let spotify = Spotify::default().client_credentials_manager(creds).build();
-            let me = spotify.me().await;
-            println!("{:?}", me?);
+            let mut tracks = Vec::<SavedTrack>::new();
+            get_all_saved_tracks(spotify, &mut tracks, 0).await;
+            println!("{:?}", tracks.len());
         }
         Err(e) => eprintln!("{}", e),
     };
     Ok(())
+}
+
+fn get_all_saved_tracks<'a>(
+    spotify: Spotify,
+    tracks: &'a mut Vec<SavedTrack>,
+    offset: u32,
+) -> Pin<Box<dyn Future<Output = ()> + 'a>> {
+    Box::pin(async move {
+        match spotify
+            .current_user_saved_tracks(Some(50), Some(offset))
+            .await
+        {
+            Ok(mut response) => {
+                if response.items.len() == 0 {
+                    return;
+                }
+                tracks.append(&mut response.items);
+                get_all_saved_tracks(spotify, tracks, offset + 50).await;
+            }
+            Err(_) => return,
+        }
+    })
 }
 
 fn get_cache_path() -> Result<PathBuf> {
@@ -51,7 +77,7 @@ fn get_cache_path() -> Result<PathBuf> {
     {
         Some(mut p) => {
             fs::create_dir_all(&p)?;
-            p.push(".spotify_token_cache.json");
+            p.push(".spotify_token");
             Ok(p)
         }
         None => Err(DioniError::new(DioniErrorType::UnkownCachePath)),
