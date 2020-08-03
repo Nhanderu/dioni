@@ -1,0 +1,11 @@
+[package]
+name = "dioni"
+version = "0.1.0"
+authors = ["Rafael Escobar <rescobar@redventures.com>"]
+edition = "2018"
+
+[dependencies]
+rspotify = "0.10"
+webbrowser = "0.5"
+tokio = { version = "0.2", features = ["full"] }
+dirs-next = "1.0"
