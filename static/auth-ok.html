@@ -2,14 +2,12 @@
 <html>
     <body>
         <h1>Thank you!</h1>
-        <p>This page will close automatically in <span id="n">5</span> seconds.</p>
+        <p>This page will close automatically in <span id="n">3</span> seconds.</p>
     </body>
     <script>
         const update = n => () => document.getElementById('n').innerText = n;
-        setTimeout(update('4'), 1000);
-        setTimeout(update('3'), 2000);
-        setTimeout(update('2'), 3000);
-        setTimeout(update('1'), 4000);
-        setTimeout(close, 5000);
+        setTimeout(update('2'), 1000);
+        setTimeout(update('1'), 2000);
+        setTimeout(close, 3000);
     </script>
 </html>
