@@ -160,7 +160,7 @@ fn get_all_saved_tracks<'a>(
                     return;
                 }
                 tracks.append(&mut response.items);
-                // get_all_saved_tracks(spotify, tracks, offset + 50).await;
+                get_all_saved_tracks(spotify, tracks, offset + 50).await;
             }
             Err(_) => return,
         }
