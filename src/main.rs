@@ -22,47 +22,25 @@ use rspotify::util::generate_random_string;
 
 #[tokio::main]
 async fn main() -> StdResult<(), Box<dyn Error>> {
-    let cache_path = get_cache_path()?;
     let mut auth = SpotifyOAuth::default()
         .redirect_uri("http://localhost:29797/")
-        .cache_path(cache_path)
-        .scope("user-library-read")
+        .cache_path(get_cache_path()?)
+        .scope("user-library-read user-modify-playback-state")
         .build();
-    match get_token(&mut auth).await {
-        Ok(token_info) => {
-            let creds = SpotifyClientCredentials::default()
-                .token_info(token_info)
-                .build();
-            let spotify = Spotify::default().client_credentials_manager(creds).build();
-            let mut tracks = Vec::<SavedTrack>::new();
-            get_all_saved_tracks(spotify, &mut tracks, 0).await;
-            println!("{:?}", tracks.len());
-        }
-        Err(e) => eprintln!("{}", e),
-    };
-    Ok(())
-}
+    let creds = SpotifyClientCredentials::default()
+        .token_info(get_token(&mut auth).await?)
+        .build();
+    let spotify = Spotify::default().client_credentials_manager(creds).build();
 
-fn get_all_saved_tracks<'a>(
-    spotify: Spotify,
-    tracks: &'a mut Vec<SavedTrack>,
-    offset: u32,
-) -> Pin<Box<dyn Future<Output = ()> + 'a>> {
-    Box::pin(async move {
-        match spotify
-            .current_user_saved_tracks(Some(50), Some(offset))
-            .await
-        {
-            Ok(mut response) => {
-                if response.items.len() == 0 {
-                    return;
-                }
-                tracks.append(&mut response.items);
-                get_all_saved_tracks(spotify, tracks, offset + 50).await;
-            }
-            Err(_) => return,
-        }
-    })
+    let mut tracks = Vec::<SavedTrack>::new();
+    get_all_saved_tracks(spotify.clone(), &mut tracks, 0).await;
+    let tracks_uris = tracks.iter().map(|x| x.track.uri.clone()).collect();
+
+    spotify.shuffle(false, None).await?;
+    spotify
+        .start_playback(None, None, Some(tracks_uris), None, None)
+        .await?;
+    Ok(())
 }
 
 fn get_cache_path() -> Result<PathBuf> {
@@ -161,4 +139,26 @@ fn make_http_response(stream: &mut TcpStream, ok: bool) -> Result<()> {
     stream.write(response.as_bytes())?;
     stream.flush()?;
     Ok(())
+}
+
+fn get_all_saved_tracks<'a>(
+    spotify: Spotify,
+    tracks: &'a mut Vec<SavedTrack>,
+    offset: u32,
+) -> Pin<Box<dyn Future<Output = ()> + 'a>> {
+    Box::pin(async move {
+        match spotify
+            .current_user_saved_tracks(Some(50), Some(offset))
+            .await
+        {
+            Ok(mut response) => {
+                if response.items.len() == 0 {
+                    return;
+                }
+                tracks.append(&mut response.items);
+                // get_all_saved_tracks(spotify, tracks, offset + 50).await;
+            }
+            Err(_) => return,
+        }
+    })
 }
