@@ -277,6 +277,7 @@ name = "dioni"
 version = "0.1.0"
 dependencies = [
  "dirs-next",
+ "rand 0.7.3",
  "rspotify",
  "tokio",
  "webbrowser",

@@ -1,6 +1,7 @@
 mod error;
 
 extern crate dirs_next;
+extern crate rand;
 extern crate rspotify;
 
 use std::env;
@@ -11,9 +12,10 @@ use std::io::prelude::*;
 use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::pin::Pin;
-use std::result::Result as StdResult;
 
 use error::{DioniError, DioniErrorType, Result};
+
+use rand::seq::SliceRandom;
 
 use rspotify::client::Spotify;
 use rspotify::model::track::SavedTrack;
@@ -21,7 +23,7 @@ use rspotify::oauth2::{SpotifyClientCredentials, SpotifyOAuth, TokenInfo};
 use rspotify::util::generate_random_string;
 
 #[tokio::main]
-async fn main() -> StdResult<(), Box<dyn Error>> {
+async fn main() -> std::result::Result<(), Box<dyn Error>> {
     let mut auth = SpotifyOAuth::default()
         .redirect_uri("http://localhost:29797/")
         .cache_path(get_cache_path()?)
@@ -34,7 +36,9 @@ async fn main() -> StdResult<(), Box<dyn Error>> {
 
     let mut tracks = Vec::<SavedTrack>::new();
     get_all_saved_tracks(spotify.clone(), &mut tracks, 0).await;
-    let tracks_uris = tracks.iter().map(|x| x.track.uri.clone()).collect();
+    let mut tracks_uris: Vec<String> = tracks.iter().map(|x| x.track.uri.clone()).collect();
+    let mut rng = rand::thread_rng();
+    tracks_uris.shuffle(&mut rng);
 
     spotify.shuffle(false, None).await?;
     spotify

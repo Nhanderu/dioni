@@ -9,3 +9,4 @@ rspotify = "0.10"
 webbrowser = "0.5"
 tokio = { version = "0.2", features = ["full"] }
 dirs-next = "1.0"
+rand = "0.7"
