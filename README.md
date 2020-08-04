@@ -16,6 +16,21 @@ with your saved tracks.
 
 But, again, I may be just too paranoid.
 
+## Install
+
+### Brew
+
+```sh
+brew tap Nhanderu/packages
+brew install dioni
+```
+
+### Cargo
+
+```sh
+cargo install dioni
+```
+
 ## License
 
 This project code is in the public domain. See the [LICENSE file][1].
