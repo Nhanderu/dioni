@@ -34,7 +34,13 @@ impl Display for Error {
             Error::AuthServerStopped => Box::new("server stopped without the auth code"),
             Error::UnkownCachePath => Box::new("couldn't find cache path"),
             Error::Io(err) => Box::new(err),
-            Error::SpotifyError(err) => Box::new(err.deref()),
+            Error::SpotifyError(err) => {
+                let e = err.deref();
+                match e.source() {
+                    Some(cause) => Box::new(cause),
+                    None => Box::new(e),
+                }
+            }
         };
         write!(f, "{}", msg)
     }

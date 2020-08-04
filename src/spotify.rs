@@ -1,4 +1,7 @@
-use super::error_handling::{Error, Result};
+use super::{
+    clear_stdout_line,
+    error_handling::{Error, Result},
+};
 use rspotify::{
     client::Spotify as SpotifyClient,
     oauth2::{SpotifyClientCredentials, SpotifyOAuth, TokenInfo},
@@ -40,13 +43,22 @@ async fn _play(
     tracks_uris: Vec<String>,
     queue_uris: Vec<String>,
 ) -> result::Result<(), Box<dyn error::Error>> {
+
     client.shuffle(false, None).await?;
     client
         .start_playback(None, None, Some(tracks_uris), None, None)
         .await?;
-    for uri in queue_uris {
-        client.add_item_to_queue(uri, None).await?;
+    println!("Shuffle finished.");
+
+    for (i, uri) in queue_uris.iter().enumerate() {
+        clear_stdout_line();
+        print!("{} out of {} tracks added to the queue.", i+1, queue_uris.len());
+        client.add_item_to_queue(uri.to_string(), None).await?;
     }
+    if queue_uris.len() > 0 {
+        println!();
+    }
+
     Ok(())
 }
 
@@ -114,11 +126,13 @@ async fn get_code_req(auth: &mut SpotifyOAuth, correct_state: String) -> Result<
 
 fn make_http_response(stream: &mut TcpStream, ok: bool) -> Result<()> {
     let response = if ok {
+        println!("Authentication was validated.");
         format!(
             "HTTP/1.1 200 OK\r\n\r\n{}",
             fs::read_to_string("static/auth-ok.html")?,
         )
     } else {
+        println!("Invalid request for authentication. Please, try again.");
         format!(
             "HTTP/1.1 400 BAD REQUEST\r\n\r\n{}",
             fs::read_to_string("static/auth-error.html")?,
