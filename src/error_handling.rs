@@ -22,6 +22,12 @@ impl From<io::Error> for Error {
     }
 }
 
+impl From<Box<dyn error::Error>> for Error {
+    fn from(err: Box<dyn error::Error>) -> Self {
+        Error::SpotifyError(err)
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let msg: Box<dyn Display> = match &self {

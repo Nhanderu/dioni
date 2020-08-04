@@ -5,10 +5,11 @@ use rspotify::{
     util::generate_random_string,
 };
 use std::{
-    fs,
+    error, fs,
     io::prelude::*,
     net::{TcpListener, TcpStream},
     path::PathBuf,
+    result,
 };
 
 pub async fn get_spotify_client(cache_path: PathBuf) -> Result<SpotifyClient> {
@@ -25,18 +26,28 @@ pub async fn get_spotify_client(cache_path: PathBuf) -> Result<SpotifyClient> {
         .build())
 }
 
-pub async fn play(client: SpotifyClient, tracks_uris: Vec<String>) -> Result<()> {
-    match client.shuffle(false, None).await {
-        Err(e) => return Err(Error::SpotifyError(From::from(e))),
-        _ => {}
-    }
-    match client
+pub async fn play(
+    client: SpotifyClient,
+    tracks_uris: Vec<String>,
+    queue_uris: Vec<String>,
+) -> Result<()> {
+    _play(client, tracks_uris, queue_uris).await?;
+    Ok(())
+}
+
+async fn _play(
+    client: SpotifyClient,
+    tracks_uris: Vec<String>,
+    queue_uris: Vec<String>,
+) -> result::Result<(), Box<dyn error::Error>> {
+    client.shuffle(false, None).await?;
+    client
         .start_playback(None, None, Some(tracks_uris), None, None)
-        .await
-    {
-        Ok(()) => Ok(()),
-        Err(e) => Err(Error::SpotifyError(From::from(e))),
+        .await?;
+    for uri in queue_uris {
+        client.add_item_to_queue(uri, None).await?;
     }
+    Ok(())
 }
 
 async fn get_token(auth: &mut SpotifyOAuth) -> Result<TokenInfo> {
