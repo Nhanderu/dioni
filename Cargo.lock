@@ -274,7 +274,7 @@ dependencies = [
 
 [[package]]
 name = "dioni"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "dirs-next",
  "rand 0.7.3",
@@ -367,7 +367,7 @@ checksum = "aa4da3c766cd7a0db8242e326e9e4e081edd567072893ed320008189715366a4"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
  "synstructure",
 ]
 
@@ -471,7 +471,7 @@ dependencies = [
  "proc-macro-hack",
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
 ]
 
 [[package]]
@@ -977,7 +977,7 @@ checksum = "2c0e815c3ee9a031fdf5af21c10aa17c573c9c6a566328d99e3936c34e36461f"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
 ]
 
 [[package]]
@@ -1404,7 +1404,7 @@ checksum = "2a0be94b04690fbaed37cddffc5c134bf537c8e3329d53e982fe04c374978f8e"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
 ]
 
 [[package]]
@@ -1477,9 +1477,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.36"
+version = "1.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cdb98bcb1f9d81d07b536179c269ea15999b5d14ea958196413869445bb5250"
+checksum = "e69abc24912995b3038597a7a593be5053eb0fb44f3cc5beec0deb421790c1f4"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
@@ -1494,7 +1494,7 @@ checksum = "b834f2d66f734cb897113e34aaff2f1ab4719ca946f9a7358dba8f8064148701"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
  "unicode-xid 0.2.1",
 ]
 
@@ -1538,7 +1538,7 @@ checksum = "bd80fc12f73063ac132ac92aceea36734f04a1d93c1240c6944e23a3b8841793"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
 ]
 
 [[package]]
@@ -1598,7 +1598,7 @@ checksum = "f0c3acc6aa564495a0f2e1d59fab677cd7f81a19994cfc7f3ad0e64301560389"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
 ]
 
 [[package]]
@@ -1782,7 +1782,7 @@ dependencies = [
  "log",
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
  "wasm-bindgen-shared",
 ]
 
@@ -1816,7 +1816,7 @@ checksum = "841a6d1c35c6f596ccea1f82504a192a60378f64b3bb0261904ad8f2f5657556"
 dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
- "syn 1.0.36",
+ "syn 1.0.38",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
