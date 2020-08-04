@@ -13,7 +13,7 @@ use std::net::{TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::pin::Pin;
 
-use error::{DioniError, DioniErrorType, Result};
+use error::{DioniError,  Result};
 
 use rand::seq::SliceRandom;
 
@@ -68,7 +68,7 @@ fn get_cache_path() -> Result<PathBuf> {
             p.push(".spotify_token");
             Ok(p)
         }
-        None => Err(DioniError::new(DioniErrorType::UnkownCachePath)),
+        None => Err(DioniError::UnkownCachePath),
     }
 }
 
@@ -131,7 +131,7 @@ async fn get_code_req(auth: &mut SpotifyOAuth, correct_state: String) -> Result<
         }
     }
 
-    Err(DioniError::new(DioniErrorType::AuthServerStopped))
+    Err(DioniError::AuthServerStopped)
 }
 
 fn make_http_response(stream: &mut TcpStream, ok: bool) -> Result<()> {
