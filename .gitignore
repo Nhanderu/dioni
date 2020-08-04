@@ -1,1 +1,4 @@
-/target
+/target/
+/.vscode/
+**/*.rs.bk
+debug
