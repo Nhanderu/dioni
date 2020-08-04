@@ -22,6 +22,8 @@ use rspotify::model::track::SavedTrack;
 use rspotify::oauth2::{SpotifyClientCredentials, SpotifyOAuth, TokenInfo};
 use rspotify::util::generate_random_string;
 
+const TRACKS_LIMIT: usize = 666;
+
 #[tokio::main]
 async fn main() -> std::result::Result<(), Box<dyn Error>> {
     let mut auth = SpotifyOAuth::default()
@@ -36,9 +38,13 @@ async fn main() -> std::result::Result<(), Box<dyn Error>> {
 
     let mut tracks = Vec::<SavedTrack>::new();
     get_all_saved_tracks(spotify.clone(), &mut tracks, 0).await;
-    let mut tracks_uris: Vec<String> = tracks.iter().map(|x| x.track.uri.clone()).collect();
     let mut rng = rand::thread_rng();
-    tracks_uris.shuffle(&mut rng);
+    tracks.shuffle(&mut rng);
+    let tracks_uris: Vec<String> = tracks
+        .iter()
+        .take(TRACKS_LIMIT)
+        .map(|x| x.track.uri.clone())
+        .collect();
 
     spotify.shuffle(false, None).await?;
     spotify
