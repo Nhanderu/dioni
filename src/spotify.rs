@@ -1,6 +1,8 @@
 use super::{
-    clear_stdout_line,
+    args_parsing::ARGS,
+    cond_print, cond_println,
     error_handling::{Error, Result},
+    utils::clear_stdout_line,
 };
 use rspotify::{
     client::Spotify as SpotifyClient,
@@ -45,36 +47,40 @@ async fn _play(
     tracks_uris: Vec<String>,
     queue_uris: Vec<String>,
 ) -> result::Result<(), Box<dyn error::Error>> {
-
     client.shuffle(false, None).await?;
     client
         .start_playback(None, None, Some(tracks_uris), None, None)
         .await?;
-    println!("Shuffle finished.");
+    cond_println!("Shuffle finished.");
 
     for (i, uri) in queue_uris.iter().enumerate() {
         clear_stdout_line();
-        print!("{} out of {} tracks added to the queue.", i+1, queue_uris.len());
+        cond_print!(
+            "{} out of {} tracks added to the queue.",
+            i + 1,
+            queue_uris.len()
+        );
         client.add_item_to_queue(uri.to_string(), None).await?;
     }
     if queue_uris.len() > 0 {
-        println!();
+        cond_println!();
     }
 
     Ok(())
 }
 
 async fn get_token(auth: &mut SpotifyOAuth) -> Result<TokenInfo> {
-    match auth.get_cached_token().await {
-        Some(token_info) => Ok(token_info),
-        None => {
-            let state = generate_random_string(16);
-            let auth_url = auth.get_authorize_url(Some(&state), None);
-            let code_future = get_code_req(auth, state);
-            webbrowser::open(&auth_url)?;
-            return code_future.await;
-        }
+    if !ARGS.force_auth {
+        match auth.get_cached_token().await {
+            Some(token_info) => return Ok(token_info),
+            None => {}
+        };
     }
+    let state = generate_random_string(16);
+    let auth_url = auth.get_authorize_url(Some(&state), None);
+    let code_future = get_code_req(auth, state);
+    webbrowser::open(&auth_url)?;
+    return code_future.await;
 }
 
 async fn get_code_req(auth: &mut SpotifyOAuth, correct_state: String) -> Result<TokenInfo> {
@@ -128,13 +134,13 @@ async fn get_code_req(auth: &mut SpotifyOAuth, correct_state: String) -> Result<
 
 fn make_http_response(stream: &mut TcpStream, ok: bool) -> Result<()> {
     let response = if ok {
-        println!("Authentication was validated.");
+        cond_println!("Authentication was validated.");
         format!(
             "HTTP/1.1 200 OK\r\n\r\n{}",
             fs::read_to_string("static/auth-ok.html")?,
         )
     } else {
-        println!("Invalid request for authentication. Please, try again.");
+        cond_println!("Invalid request for authentication. Please, try again.");
         format!(
             "HTTP/1.1 400 BAD REQUEST\r\n\r\n{}",
             fs::read_to_string("static/auth-error.html")?,

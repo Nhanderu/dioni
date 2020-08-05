@@ -16,6 +16,20 @@ with your saved tracks.
 
 But, again, I may be just too paranoid.
 
+## Things you need to know
+
+- It asks for your authentication opening your browser.
+- It caches the authentication token so it doesn't authenticate again. You can
+force authentication again with the flag `--force-auth`.
+- The cache path is defined by `$DIONI_CACHE`. If not defined, it tries
+`$XDG_CACHE_HOME/dioni`. If it's also not defined, it gets the default cache dir
+for you OS (Linux: `~/.cache`, Mac: `~/Library/Caches`, Windows:
+`~\AppData\Local`) plus `/dioni`. You can check it via `--cache-path` flag.
+- If the directory in the cache path doesn't exists, it'll be created.
+- If your total liked tracks exceeds our limit, it's gonna ask if you want to
+add them in the queue. This can be pre-defined with the flags `--ignore-excess`
+and `--add-excess-to-queue`.
+
 ## Install
 
 ### Brew
@@ -30,6 +44,43 @@ brew install dioni
 ```sh
 cargo install dioni
 ```
+
+## Run
+
+#### `dioni`
+
+Runs the program with default configuration.
+
+### Flags
+
+#### `-h` or `--help`
+
+Shows the CLI help message.
+
+#### `-v` or `--version`
+
+Shows the CLI version.
+
+#### `-q` or `--quiet`
+
+Runs the program without writing to stdout. Requires `--add-excess-to-queue` or
+`--ignore-excess`.
+
+#### `--ignore-excess`
+
+Ignore songs that exceed the Spotify limit.
+
+#### `--add-excess-to-queue`
+
+Add songs that exceed the Spotify limit to the queue.
+
+#### `-a` or `--force-auth`
+
+Clears the authentication cache, forcing it to ask for authentication again.
+
+#### `--cache-path`
+
+Shows the cache path.
 
 ## License
 
