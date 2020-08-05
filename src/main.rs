@@ -40,7 +40,10 @@ fn get_cache_path() -> Result<PathBuf> {
             p.push("dioni");
             Some(p)
         }))
-        .or(dirs_next::cache_dir())
+        .or(dirs_next::cache_dir().and_then(|mut p| {
+            p.push("dioni");
+            Some(p)
+        }))
     {
         Some(mut p) => {
             fs::create_dir_all(&p)?;
