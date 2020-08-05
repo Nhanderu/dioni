@@ -56,27 +56,27 @@ fn parse_args() -> Args {
                     exit(0);
                 }
                 Err(e) => {
-                    println!("Error: {}", e);
+                    eprintln!("Error: {}", e);
                     exit(1);
                 }
             },
-            _ => {
-                if arg.starts_with("-") {
-                    for flag in arg.chars().skip(1) {
-                        match flag {
-                            'h' => help(),
-                            'v' => version(),
-                            'q' => parsed_args.quiet = true,
-                            'a' => parsed_args.force_auth = true,
-                            _ => {
-                                eprintln!("Unknown flag \"-{}\".\n", flag);
-                                println!("{}", HELP_MSG);
-                                exit(1);
-                            }
+            _ if arg.starts_with("-") => {
+                for flag in arg.chars().skip(1) {
+                    match flag {
+                        'h' => help(),
+                        'v' => version(),
+                        'q' => parsed_args.quiet = true,
+                        'a' => parsed_args.force_auth = true,
+                        _ => {
+                            eprintln!("Unknown flag \"-{}\".\n", flag);
+                            println!("{}", HELP_MSG);
+                            exit(1);
                         }
                     }
-                    continue;
                 }
+                continue;
+            }
+            _ => {
                 eprintln!("Unknown argument \"{}\".\n", arg);
                 println!("{}", HELP_MSG);
                 exit(1);
