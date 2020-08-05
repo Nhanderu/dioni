@@ -18,6 +18,8 @@ use std::{
 pub async fn get_spotify_client(cache_path: PathBuf) -> Result<SpotifyClient> {
     let mut auth = SpotifyOAuth::default()
         .redirect_uri("http://localhost:29797/")
+        .client_id("ee0929df2d71455dbba55aeba1605e37")
+        .client_secret("b840d375072840dcb4879b337e11c4ef")
         .cache_path(cache_path)
         .scope("user-library-read user-modify-playback-state")
         .build();
