@@ -274,7 +274,7 @@ dependencies = [
 
 [[package]]
 name = "dioni"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "dirs-next",
  "rand 0.7.3",
