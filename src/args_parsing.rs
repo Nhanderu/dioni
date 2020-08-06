@@ -60,7 +60,7 @@ fn parse_args() -> Args {
                     exit(1);
                 }
             },
-            _ if arg.starts_with("-") => {
+            _ if arg.starts_with("-") && !arg.starts_with("--") => {
                 for flag in arg.chars().skip(1) {
                     match flag {
                         'h' => help(),
