@@ -57,7 +57,7 @@ async fn get_tracks_uris(mut cache_path: PathBuf, client: SpotifyClient) -> Vec<
     if !ARGS.force_fetching {
         match get_cached_tracks_uris(cache_path.clone()).await {
             Ok(tracks) => {
-                cond_println!("Tracks retrived from cache.");
+                cond_println!("Tracks retrieved from cache.");
                 return tracks;
             },
             Err(_) => {}
