@@ -18,9 +18,12 @@ But, again, I may be just too paranoid.
 
 ## Things you need to know
 
-- It asks for your authentication opening your browser.
+- It asks for your authentication opening your browser, defined by the `BROWSER`
+environment variable.
 - It caches the authentication token so it doesn't authenticate again. You can
 force authentication again with the flag `--force-auth`.
+- It caches your saved tracks too, and you can update it with `-f` or
+`--force-fetching`.
 - The cache path is defined by `$DIONI_CACHE`. If not defined, it tries
 `$XDG_CACHE_HOME/dioni`. If it's also not defined, it gets the default cache dir
 for you OS (Linux: `~/.cache`, Mac: `~/Library/Caches`, Windows:
@@ -74,9 +77,13 @@ Ignore songs that exceed the Spotify limit.
 
 Add songs that exceed the Spotify limit to the queue.
 
-#### `-a` or `--force-auth`
+#### `-f` or `--force-fetching`
 
-Clears the authentication cache, forcing it to ask for authentication again.
+Ignores tracks cache, forcing it to fetch for them again.
+
+#### `--force-auth`
+
+Ignores authentication cache, forcing it to ask for authentication again.
 
 #### `--cache-path`
 

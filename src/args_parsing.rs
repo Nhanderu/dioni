@@ -11,8 +11,9 @@ Flags:
     -q, --quiet            Surpress any message to stdout
     --ignore-excess        Ignore songs that exceed the Spotify limit
     --add-excess-to-queue  Add songs that exceed the Spotify limit to the queue
-    -a, --force-auth       Force authentication
-    --cache-path           Shows the cache path.
+    -f, --force-fetching   Force tracks fetching
+    --force-auth           Force authentication
+    --cache-path           Shows the cache path
 ";
 
 lazy_static! {
@@ -23,6 +24,7 @@ pub struct Args {
     pub quiet: bool,
     pub ignore_excess: bool,
     pub add_excess_to_queue: bool,
+    pub force_fetching: bool,
     pub force_auth: bool,
 }
 
@@ -40,6 +42,7 @@ fn parse_args() -> Args {
         quiet: false,
         ignore_excess: false,
         add_excess_to_queue: false,
+        force_fetching: false,
         force_auth: false,
     };
     for arg in args().skip(1) {
@@ -49,6 +52,7 @@ fn parse_args() -> Args {
             "--quiet" => parsed_args.quiet = true,
             "--ignore-excess" => parsed_args.ignore_excess = true,
             "--add-excess-to-queue" => parsed_args.add_excess_to_queue = true,
+            "--force-fetching" => parsed_args.force_fetching = true,
             "--force-auth" => parsed_args.force_auth = true,
             "--cache-path" => match get_cache_path() {
                 Ok(cache_path) => {
@@ -66,7 +70,7 @@ fn parse_args() -> Args {
                         'h' => help(),
                         'v' => version(),
                         'q' => parsed_args.quiet = true,
-                        'a' => parsed_args.force_auth = true,
+                        'f' => parsed_args.force_fetching = true,
                         _ => {
                             eprintln!("Unknown flag \"-{}\".\n", flag);
                             println!("{}", HELP_MSG);

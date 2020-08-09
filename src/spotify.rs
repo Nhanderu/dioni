@@ -17,12 +17,15 @@ use std::{
     result,
 };
 
-pub async fn get_spotify_client(cache_path: PathBuf) -> Result<SpotifyClient> {
+pub async fn get_spotify_client(mut cache_path: PathBuf) -> Result<SpotifyClient> {
+    cache_path.push(".spotify-token");
+    let auth_cache_path = cache_path.to_path_buf();
+
     let mut auth = SpotifyOAuth::default()
         .redirect_uri("http://localhost:29797/")
         .client_id("ee0929df2d71455dbba55aeba1605e37")
         .client_secret("b840d375072840dcb4879b337e11c4ef")
-        .cache_path(cache_path)
+        .cache_path(auth_cache_path)
         .scope("user-library-read user-modify-playback-state")
         .build();
     let creds = SpotifyClientCredentials::default()
