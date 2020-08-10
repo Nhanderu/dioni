@@ -274,7 +274,7 @@ dependencies = [
 
 [[package]]
 name = "dioni"
-version = "1.2.1"
+version = "1.2.2"
 dependencies = [
  "dirs-next",
  "lazy_static",
