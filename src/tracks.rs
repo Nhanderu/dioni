@@ -1,8 +1,16 @@
 use super::{args_parsing::ARGS, cond_print, cond_println, utils::clear_stdout_line};
 use rand::seq::SliceRandom;
 use rspotify::{client::Spotify as SpotifyClient, model::track::SavedTrack};
-use std::{error, future::Future, io::stdin, path::PathBuf, pin::Pin, fs::File,io::{BufReader, BufWriter}};
 use serde_json;
+use std::{
+    error,
+    fs::File,
+    future::Future,
+    io::stdin,
+    io::{BufReader, BufWriter},
+    path::PathBuf,
+    pin::Pin,
+};
 
 const TRACKS_LIMIT: usize = 666;
 
@@ -10,23 +18,22 @@ pub async fn get_shuffled_tracks_uris(
     cache_path: PathBuf,
     client: SpotifyClient,
 ) -> (Vec<String>, Vec<String>) {
-
-    let tracks_uris = get_tracks_uris(cache_path, client).await;
+    let mut tracks_uris = get_tracks_uris(cache_path, client).await;
+    tracks_uris.shuffle(&mut rand::thread_rng());
     cond_println!("{} saved tracks found in total.", tracks_uris.len());
 
     if tracks_uris.len() <= TRACKS_LIMIT {
         return (tracks_uris, Vec::new());
     }
 
-
     let iter = tracks_uris.iter().map(|x| x.to_string());
-    let limited = iter.clone().take(TRACKS_LIMIT).collect();
+    let limited_iter = iter.clone().take(TRACKS_LIMIT).collect();
 
     if ARGS.ignore_excess {
         cond_println!(
             "The total saved tracks is above our limit and the excess is going to be ignored."
         );
-        return (limited, Vec::new());
+        return (limited_iter, Vec::new());
     }
 
     if ARGS.add_excess_to_queue {
@@ -42,14 +49,14 @@ pub async fn get_shuffled_tracks_uris(
         let mut input = String::new();
         if stdin().read_line(&mut input).is_err() {
             cond_println!("Error reading your option; 'no' was assumed.");
-            return (limited, Vec::new());
+            return (limited_iter, Vec::new());
         }
         if input.trim() != "yes" {
-            return (limited, Vec::new());
+            return (limited_iter, Vec::new());
         }
     }
 
-    (limited, iter.skip(TRACKS_LIMIT).collect())
+    (limited_iter, iter.skip(TRACKS_LIMIT).collect())
 }
 
 async fn get_tracks_uris(mut cache_path: PathBuf, client: SpotifyClient) -> Vec<String> {
@@ -59,7 +66,7 @@ async fn get_tracks_uris(mut cache_path: PathBuf, client: SpotifyClient) -> Vec<
             Ok(tracks) => {
                 cond_println!("Tracks retrieved from cache.");
                 return tracks;
-            },
+            }
             Err(_) => {}
         };
     }
@@ -68,8 +75,11 @@ async fn get_tracks_uris(mut cache_path: PathBuf, client: SpotifyClient) -> Vec<
     fetch_saved_tracks(client, &mut tracks, 0).await;
     clear_stdout_line();
 
-    tracks.shuffle(&mut rand::thread_rng());
-    let tracks_uris: Vec<String> = tracks.iter().map(|x| x.track.uri.clone()).collect();
+    let mut tracks_uris = Vec::<String>::with_capacity(tracks.len());
+    for track in tracks {
+        tracks_uris.push(track.track.uri);
+    }
+
     let _ = cache_tracks_uris(cache_path, tracks_uris.clone());
     tracks_uris
 }
@@ -79,7 +89,10 @@ async fn get_cached_tracks_uris(cache_path: PathBuf) -> Result<Vec<String>, Box<
     Ok(serde_json::from_reader(BufReader::new(file))?)
 }
 
-fn cache_tracks_uris(cache_path: PathBuf, tracks_uris: Vec<String>) -> Result<(), Box<dyn error::Error>> {
+fn cache_tracks_uris(
+    cache_path: PathBuf,
+    tracks_uris: Vec<String>,
+) -> Result<(), Box<dyn error::Error>> {
     let mut file = File::create(cache_path)?;
     serde_json::to_writer(BufWriter::new(&mut file), &tracks_uris)?;
     Ok(())
