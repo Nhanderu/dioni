@@ -7,31 +7,32 @@ A CLI that shuffle plays your saved tracks on Spotify.
 
 ## Why
 
-I may be too paranoid, but I always felt like Spotify's shuffle play is fake. It
-seems to play the same bands, or at least have some kind of intelligence behind
-it.
+I may be too paranoid, but I always felt like Spotify's shuffle play is
+fake. It seems to play the same bands, or at least have some kind of
+intelligence behind it.
 
-So this project was born with the intention of having a **true random** queue
-with your saved tracks.
+So this project was born with the intention of having a **true random**
+queue with your saved tracks.
 
 But, again, I may be just too paranoid.
 
 ## Things you need to know
 
-- It asks for your authentication opening your browser, defined by the `BROWSER`
-environment variable.
-- It caches the authentication token so it doesn't authenticate again. You can
-force authentication again with the flag `--force-auth`.
+- It asks for your authentication opening your browser, defined by the
+`BROWSER` environment variable.
+- It caches the authentication token so it doesn't authenticate again.
+You can force authentication again with the flag `--force-auth`.
 - It caches your saved tracks too, and you can update it with `-f` or
 `--force-fetching`.
 - The cache path is defined by `$DIONI_CACHE`. If not defined, it tries
-`$XDG_CACHE_HOME/dioni`. If it's also not defined, it gets the default cache dir
-for you OS (Linux: `~/.cache`, Mac: `~/Library/Caches`, Windows:
-`~\AppData\Local`) plus `/dioni`. You can check it via `--cache-path` flag.
+`$XDG_CACHE_HOME/dioni`. If it's also not defined, it gets the default
+cache dir for you OS (Linux: `~/.cache`, Mac: `~/Library/Caches`,
+Windows: `~\AppData\Local`) plus `/dioni`. You can check it via
+`--cache-path` flag.
 - If the directory in the cache path doesn't exists, it'll be created.
-- If your total liked tracks exceeds our limit, it's gonna ask if you want to
-add them in the queue. This can be pre-defined with the flags `--ignore-excess`
-and `--add-excess-to-queue`.
+- If your total liked tracks exceeds our limit, it's gonna ask if you
+want to add them in the queue. This can be pre-defined with the flags
+`--ignore-excess` and `--add-excess-to-queue`.
 
 ## Install
 
@@ -66,8 +67,8 @@ Shows the CLI version.
 
 #### `-q` or `--quiet`
 
-Runs the program without writing to stdout. Requires `--add-excess-to-queue` or
-`--ignore-excess`.
+Runs the program without writing to stdout. Requires
+`--add-excess-to-queue` or `--ignore-excess`.
 
 #### `--ignore-excess`
 
@@ -83,7 +84,8 @@ Ignores tracks cache, forcing it to fetch for them again.
 
 #### `--force-auth`
 
-Ignores authentication cache, forcing it to ask for authentication again.
+Ignores authentication cache, forcing it to ask for authentication
+again.
 
 #### `--cache-path`
 
@@ -95,9 +97,9 @@ This project code is in the public domain. See the [LICENSE file][1].
 
 ### Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you shall be in the public domain, without any
-additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally
+submitted for inclusion in the work by you shall be in the public
+domain, without any additional terms or conditions.
 
 [1]: ./LICENSE
 
